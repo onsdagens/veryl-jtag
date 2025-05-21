@@ -1,7 +1,9 @@
 module InstructionRegister (
-    rst : input reset_async_low,
-    td_i: input logic          ,
-    tck : input clock          ,
+    rst_ni: input reset_async_low,
+    td_i  : input logic          ,
+    tck_i : input clock          ,
+    // i think we need this unfortunately or we will shift out
+    tms_i: input logic,
     // essentially a write enable
     sir_i: input logic,
     // captures shift register into
@@ -12,15 +14,20 @@ module InstructionRegister (
 ) {
     var shift_register: logic<4>;
     var data          : logic<4>;
+    var counter       : logic<4>;
     assign insn_o         = data;
     always_ff {
         if_reset {
             shift_register = 0;
             data           = 0;
+            counter        = 0;
         } else {
-            if sir_i {
-                shift_register      = shift_register >> 1;
-                shift_register[msb] = td_i;
+            // that tms is even involved here is abit ...
+            if sir_i && (tms_i == 0) {
+                shift_register      =  shift_register >> 1;
+                shift_register[msb] =  td_i;
+                counter             += 1;
+
             } else if uir_i {
                 data = shift_register;
             }

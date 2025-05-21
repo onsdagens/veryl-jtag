@@ -39,9 +39,12 @@ module JtagTop (
     // TODO: Rename this project to something else.
     // Maybe jtag_regs?
     inst instr_reg: jtag_vr::InstructionRegister (
-        rst       ,
-        td_i : TDI,
-        tck  : TCK,
+        rst_ni: rst,
+        td_i  : TDI,
+        tck_i : TCK,
+
+        tms_i: TMS,
+
         sir_i: SIR,
         uir_i: UIR,
 
