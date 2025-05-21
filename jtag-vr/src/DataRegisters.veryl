@@ -1,0 +1,7 @@
+module DataRegisters (
+    instruction_i: input  logic<4>,
+    td_o         : output logic   ,
+) {
+    var outputs: logic [16];
+    assign td_o    = outputs[instruction_i];
+}

@@ -1,0 +1,10 @@
+[project]
+name = "veryl_jtag"
+version = "0.1.0"
+
+[dependencies]
+jtag_vr = {version = "0.1.0", path = "./jtag-vr/"}
+tap_controller = {version = "0.1.0", path = "./tap-controller/"}
+
+[build]
+exclude_std = true

@@ -1,0 +1,56 @@
+module JtagTop (
+    // Physical on board reset
+    rst: input reset_async_low,
+
+    // Debugging
+    led0: output logic,
+    led1: output logic,
+    led2: output logic,
+    led3: output logic,
+
+    // JTAG Clock
+    TCK: input clock,
+    // JTAG IO
+    TDO: output logic,
+    TDI: input  logic,
+    TMS: input  logic,
+) {
+    // for now
+    assign TDO = 0;
+    // ---
+    // TAP Controller
+    var SDR  : logic   ;
+    var SIR  : logic   ;
+    var UIR  : logic   ;
+    var state: logic<4>;
+    inst tap_ctl: tap_controller::TAPController (
+        rst         ,
+        TCK         ,
+        TMS         ,
+        SDR         ,
+        SIR         ,
+        UIR         ,
+        state: state,
+    );
+    // ---
+    // JTAG Registers
+    // Intermediate signals
+    var insn: logic<4>;
+    // TODO: Rename this project to something else.
+    // Maybe jtag_regs?
+    inst instr_reg: jtag_vr::InstructionRegister (
+        rst       ,
+        td_i : TDI,
+        tck  : TCK,
+        sir_i: SIR,
+        uir_i: UIR,
+
+        insn_o: insn,
+    );
+    // Debugging
+    assign led0 = insn[0];
+    assign led1 = insn[1];
+    assign led2 = insn[2];
+    assign led3 = insn[3];
+    // ---
+}

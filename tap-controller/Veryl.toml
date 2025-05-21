@@ -1,0 +1,6 @@
+[project]
+name = "tap_controller"
+version = "0.1.0"
+
+[build]
+exclude_std = true

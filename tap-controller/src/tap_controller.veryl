@@ -1,0 +1,179 @@
+module TAPController (
+    // Physical reset on board
+    rst: input reset_async_low,
+    // JTAG Clock
+    TCK: input clock,
+    // JTAG IO
+    TMS: input logic,
+    // JTAG State states
+    SDR: output logic,
+    SIR: output logic,
+    UIR: output logic,
+
+    // Debug, for now
+    state: output logic<4>,
+) {
+    enum TAPState {
+        // Base States
+        TLR = 0,
+        RTI = 1,
+        // DR Path
+        SDRS = 2,
+        CDR = 3,
+        SDR = 4,
+        E1DR = 5,
+        PDR = 6,
+        E2DR = 7,
+        UDR = 8,
+        // IR Path
+        SIRS = 9,
+        CIR = 10,
+        SIR = 11,
+        E1IR = 12,
+        PIR = 13,
+        E2IR = 14,
+        UIR = 15,
+    }
+
+    var current_state: TAPState;
+    assign SDR           = current_state == TAPState::SDR;
+    assign SIR           = current_state == TAPState::SIR;
+    assign UIR           = current_state == TAPState::UIR;
+    assign state         = current_state as 4;
+    always_ff {
+        if_reset {
+            current_state = TAPState::TLR;
+
+        } else {
+            case current_state {
+                TAPState::TLR: {
+
+                                   if TMS {
+                                       current_state = TAPState::TLR;
+                                   } else {
+                                       current_state = TAPState::RTI;
+                                   }
+                               }
+                TAPState::RTI: {
+
+                                   if TMS {
+                                       current_state = TAPState::SDRS;
+                                   } else {
+                                       current_state = TAPState::RTI;
+                                   }
+                               }
+                TAPState::SDRS: {
+
+                                    if TMS {
+                                        current_state = TAPState::SIRS;
+                                    } else {
+                                        current_state = TAPState::CDR;
+                                    }
+                                }
+                TAPState::CDR: {
+
+                                   if TMS {
+                                       current_state = TAPState::E1DR;
+                                   } else {
+                                       current_state = TAPState::SDR;
+                                   }
+                               }
+                TAPState::SDR: {
+
+                                   if TMS {
+                                       current_state = TAPState::E1DR;
+                                   } else {
+                                       current_state = TAPState::SDR;
+                                   }
+                               }
+                TAPState::E1DR: {
+
+                                    if TMS {
+                                        current_state = TAPState::UDR;
+                                    } else {
+                                        current_state = TAPState::PDR;
+                                    }
+                                }
+                TAPState::PDR: {
+
+                                   if TMS {
+                                       current_state = TAPState::E2DR;
+                                   } else {
+                                       current_state = TAPState::PDR;
+                                   }
+                               }
+                TAPState::E2DR: {
+
+                                    if TMS {
+                                        current_state = TAPState::UDR;
+                                    } else {
+                                        current_state = TAPState::SDR;
+                                    }
+                                }
+                TAPState::UDR: {
+
+                                   if TMS {
+                                       current_state = TAPState::SDRS;
+                                   } else {
+                                       current_state = TAPState::RTI;
+                                   }
+                               }
+                TAPState::SIRS: {
+
+                                    if TMS {
+                                        current_state = TAPState::TLR;
+                                    } else {
+                                        current_state = TAPState::CIR;
+                                    }
+                                }
+                TAPState::CIR: {
+
+                                   if TMS {
+                                       current_state = TAPState::E1IR;
+                                   } else {
+                                       current_state = TAPState::SIR;
+                                   }
+                               }
+                TAPState::SIR: {
+
+                                   if TMS {
+                                       current_state = TAPState::E1IR;
+                                   } else {
+                                       current_state = TAPState::SIR;
+                                   }
+                               }
+                TAPState::E1IR: {
+
+                                    if TMS {
+                                        current_state = TAPState::UIR;
+                                    } else {
+                                        current_state = TAPState::PIR;
+                                    }
+                                }
+                TAPState::PIR: {
+
+                                   if TMS {
+                                       current_state = TAPState::E2IR;
+                                   } else {
+                                       current_state = TAPState::PIR;
+                                   }
+                               }
+                TAPState::E2IR: {
+                                    if TMS {
+                                        current_state = TAPState::UIR;
+                                    } else {
+                                        current_state = TAPState::SIR;
+                                    }
+                                }
+                TAPState::UIR: {
+                                   if TMS {
+                                       current_state = TAPState::SDRS;
+                                   } else {
+                                       current_state = TAPState::RTI;
+                                   }
+                               }
+            }
+        }
+    }
+
+}

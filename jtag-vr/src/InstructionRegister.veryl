@@ -1,0 +1,29 @@
+module InstructionRegister (
+    rst : input reset_async_low,
+    td_i: input logic          ,
+    tck : input clock          ,
+    // essentially a write enable
+    sir_i: input logic,
+    // captures shift register into
+    // actual register
+    uir_i: input logic,
+    // this is the captured instruction
+    insn_o: output logic<4>,
+) {
+    var shift_register: logic<4>;
+    var data          : logic<4>;
+    assign insn_o         = data;
+    always_ff {
+        if_reset {
+            shift_register = 0;
+            data           = 0;
+        } else {
+            if sir_i {
+                shift_register      = shift_register >> 1;
+                shift_register[msb] = td_i;
+            } else if uir_i {
+                data = shift_register;
+            }
+        }
+    }
+}
