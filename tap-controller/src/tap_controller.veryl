@@ -9,7 +9,7 @@ module TAPController (
     SDR: output logic,
     SIR: output logic,
     UIR: output logic,
-
+    CDR: output logic,
     // Debug, for now
     state: output logic<4>,
 ) {
@@ -39,6 +39,7 @@ module TAPController (
     assign SDR           = current_state == TAPState::SDR;
     assign SIR           = current_state == TAPState::SIR;
     assign UIR           = current_state == TAPState::UIR;
+    assign CDR           = current_state == TAPState::CDR;
     assign state         = current_state as 4;
     always_ff {
         if_reset {

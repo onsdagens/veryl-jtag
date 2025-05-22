@@ -16,12 +16,13 @@ module JtagTop (
     TMS: input  logic,
 ) {
     // for now
-    assign TDO = 0;
+    //assign TDO = 0;
     // ---
     // TAP Controller
     var SDR  : logic   ;
     var SIR  : logic   ;
     var UIR  : logic   ;
+    var CDR  : logic   ;
     var state: logic<4>;
     inst tap_ctl: tap_controller::TAPController (
         rst         ,
@@ -30,10 +31,12 @@ module JtagTop (
         SDR         ,
         SIR         ,
         UIR         ,
+        CDR         ,
         state: state,
     );
     // ---
     // JTAG Registers
+    // Instruction Reg
     // Intermediate signals
     var insn: logic<4>;
     // TODO: Rename this project to something else.
@@ -49,6 +52,16 @@ module JtagTop (
         uir_i: UIR,
 
         insn_o: insn,
+    );
+    // Data Regs
+    inst data_regs: jtag_vr::DataRegisters (
+        rst_ni       : rst ,
+        tck_i        : TCK ,
+        instruction_i: insn,
+        data_o       : TDO ,
+        tdi_i        : TDI ,
+        cdr_i        : CDR ,
+        sdr_i        : SDR ,
     );
     // Debugging
     assign led0 = insn[0];
