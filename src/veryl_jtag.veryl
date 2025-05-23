@@ -23,6 +23,7 @@ module JtagTop (
     var SIR  : logic   ;
     var UIR  : logic   ;
     var CDR  : logic   ;
+		var UDR	 : logic;
     var state: logic<4>;
     inst tap_ctl: tap_controller::TAPController (
         rst         ,
@@ -32,6 +33,7 @@ module JtagTop (
         SIR         ,
         UIR         ,
         CDR         ,
+				UDR					,
         state: state,
     );
     // ---
@@ -62,6 +64,7 @@ module JtagTop (
         tdi_i        : TDI ,
         cdr_i        : CDR ,
         sdr_i        : SDR ,
+				udr_i					: UDR,
     );
     // Debugging
     assign led0 = insn[0];

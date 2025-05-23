@@ -6,11 +6,10 @@ module DataRegisters (
     tdi_i        : input  logic             ,
     cdr_i        : input  logic             ,
     sdr_i        : input  logic             ,
-
+		udr_i				: input logic,
 ) {
     var outputs  : logic [16];
     assign data_o    = outputs[instruction_i];
-    var ID_CODE_O: logic;
     // these should be connected to TDO of each
     // data register
     assign outputs[0]  = 0;
@@ -19,7 +18,7 @@ module DataRegisters (
     assign outputs[3]  = 0;
     assign outputs[4]  = 0;
     assign outputs[5]  = 0;
-    assign outputs[6]  = ID_CODE_O;
+    //assign outputs[6]  = ID_CODE_O;
     assign outputs[7]  = 0;
     assign outputs[8]  = 0;
     assign outputs[9]  = 0;
@@ -28,27 +27,19 @@ module DataRegisters (
     assign outputs[12] = 0;
     assign outputs[13] = 0;
     assign outputs[14] = 0;
-    assign outputs[15] = 0;
-    // make this into a module use generics for width and parameters
-    // for initial value and writeability
-    let ID_CODE   : logic<32> = 'hDEADBEEF;
-    var ID_CODE_SR: logic<32>;
-    assign ID_CODE_O  = ID_CODE_SR[lsb];
-    always_ff {
-        if_reset {
-            ID_CODE_SR = 0;
-        } else {
-            if cdr_i {
-                if instruction_i == 6 {
-                    ID_CODE_SR = ID_CODE;
-                }
-            } else if sdr_i {
-                // do we really care about this we can probably load all regs into their SRs, same with shifting them out, since only the selected one is connected to anything in any case
-                // but, we only want to update the correct reg.
-                if instruction_i == 6 {
-                    ID_CODE_SR = ID_CODE_SR >> 1;
-                }
-            }
-        }
-    }
+    assign outputs[15] = 0;	
+		inst idcode_reg: DataRegister::<32> #(
+			InitialValue: 'hDEADBEEF,
+		)
+		(
+			bit_out: outputs[6],
+			tck_i,
+			rst_ni,
+
+			cdr_i,
+			sdr_i,
+			tdi_i,
+			udr_i,
+			instruction_i,
+		);
 }

@@ -14,19 +14,18 @@ module InstructionRegister (
 ) {
     var shift_register: logic<4>;
     var data          : logic<4>;
-    var counter       : logic<4>;
-    assign insn_o         = data;
+
+    assign insn_o = data;
     always_ff {
         if_reset {
             shift_register = 0;
             data           = 0;
-            counter        = 0;
+
         } else {
             // that tms is even involved here is abit ...
             if sir_i && (tms_i == 0) {
-                shift_register      =  shift_register >> 1;
-                shift_register[msb] =  td_i;
-                counter             += 1;
+                shift_register      = shift_register >> 1;
+                shift_register[msb] = td_i;
 
             } else if uir_i {
                 data = shift_register;
