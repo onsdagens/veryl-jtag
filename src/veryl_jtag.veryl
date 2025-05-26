@@ -14,17 +14,32 @@ module JtagTop (
     TDO: output logic,
     TDI: input  logic,
     TMS: input  logic,
+
+
+    // TAP Controller output for implementing wrappers
+    sdr_o: output logic,
+    sir_o: output logic,
+    uir_o: output logic,
+    // probably these two are actually the only ones needed from outside
+    cdr_o: output logic,
+    udr_o: output logic,
+
+    instruction_o: output logic<4>,
 ) {
-    // for now
-    //assign TDO = 0;
     // ---
     // TAP Controller
+
     var SDR  : logic   ;
     var SIR  : logic   ;
     var UIR  : logic   ;
     var CDR  : logic   ;
-		var UDR	 : logic;
+    var UDR  : logic   ;
     var state: logic<4>;
+    assign sdr_o = SDR;
+    assign sir_o = SIR;
+    assign uir_o = UIR;
+    assign cdr_o = CDR;
+    assign udr_o = UDR;
     inst tap_ctl: tap_controller::TAPController (
         rst         ,
         TCK         ,
@@ -33,14 +48,15 @@ module JtagTop (
         SIR         ,
         UIR         ,
         CDR         ,
-				UDR					,
+        UDR         ,
         state: state,
     );
     // ---
     // JTAG Registers
     // Instruction Reg
     // Intermediate signals
-    var insn: logic<4>;
+    var insn         : logic<4>;
+    assign instruction_o = insn;
     // TODO: Rename this project to something else.
     // Maybe jtag_regs?
     inst instr_reg: jtag_vr::InstructionRegister (
@@ -56,7 +72,7 @@ module JtagTop (
         insn_o: insn,
     );
     // Data Regs
-		var data_reg: logic<8>;
+    var data_reg: logic<8>;
     inst data_regs: jtag_vr::DataRegisters (
         rst_ni       : rst ,
         tck_i        : TCK ,
@@ -65,10 +81,10 @@ module JtagTop (
         tdi_i        : TDI ,
         cdr_i        : CDR ,
         sdr_i        : SDR ,
-				udr_i					: UDR,
-				tms_i: TMS,
+        udr_i        : UDR ,
+        tms_i        : TMS ,
 
-				data_reg_o: data_reg,
+        data_reg_o: data_reg,
     );
     // Debugging
     assign led0 = data_reg[0];
