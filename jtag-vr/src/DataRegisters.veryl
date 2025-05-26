@@ -6,19 +6,29 @@ module DataRegisters (
     tdi_i        : input  logic             ,
     cdr_i        : input  logic             ,
     sdr_i        : input  logic             ,
-		udr_i				: input logic,
+    udr_i        : input  logic             ,
+    tms_i        : input  logic             ,
+
+    // here we expose all of the data register
+    // registers.
+    // I don't see how it can be done cleaner
+    // since they may (and probably will)
+    // have different widths.
+    data_reg_o: output logic<8>,
 ) {
-    var outputs  : logic [16];
-    assign data_o    = outputs[instruction_i];
+    // --- Intermediate signals
+    var outputs   : logic [16];
+    var idcode_out: logic     ;
+    var data_out  : logic     ;
     // these should be connected to TDO of each
     // data register
     assign outputs[0]  = 0;
-    assign outputs[1]  = 0;
+    assign outputs[1]  = data_out;
     assign outputs[2]  = 0;
     assign outputs[3]  = 0;
     assign outputs[4]  = 0;
     assign outputs[5]  = 0;
-    //assign outputs[6]  = ID_CODE_O;
+    assign outputs[6]  = idcode_out;
     assign outputs[7]  = 0;
     assign outputs[8]  = 0;
     assign outputs[9]  = 0;
@@ -27,19 +37,59 @@ module DataRegisters (
     assign outputs[12] = 0;
     assign outputs[13] = 0;
     assign outputs[14] = 0;
-    assign outputs[15] = 0;	
-		inst idcode_reg: DataRegister::<32> #(
-			InitialValue: 'hDEADBEEF,
-		)
-		(
-			bit_out: outputs[6],
-			tck_i,
-			rst_ni,
+    assign outputs[15] = 0;
+    // ---
 
-			cdr_i,
-			sdr_i,
-			tdi_i,
-			udr_i,
-			instruction_i,
-		);
+    assign data_o = outputs[instruction_i];
+
+    // --- STANDARD REG
+    // TODO: The language doesn't support anonymous identifiers
+    // here yet, so we need a intermediate throwaway signal.
+    // Fix this once it's fixed on language level.
+    //var idcode_throwaway: logic<32>;
+    inst idcode_reg: DataRegister::<32> #(
+        InitialValue: 'hDEADBEEF,
+        Addr        : 'b0110    ,
+    ) (
+        bit_out: idcode_out,
+        tck_i              ,
+        rst_ni             ,
+
+        cdr_i           ,
+        sdr_i           ,
+        tdi_i           ,
+        udr_i           ,
+        tms_i           ,
+        instruction_i   ,
+        register_o   : _,
+    );
+    // ---
+
+    // --- PROGRAMMER DATA REG
+    // here we can technically up the throughput by capturing TDO directly,
+    // but i don't really care for the extra edge case for some ~10% extra
+    // on an already Mbit+ line when we are sending <100kB.
+    var data_reg_out: logic<8>;
+
+    inst data_reg: DataRegister::<8> #(
+        Writeable: true  ,
+        Addr     : 'b0001,
+    ) (
+        bit_out: data_out,
+        tck_i            ,
+        rst_ni           ,
+
+        cdr_i          ,
+        sdr_i          ,
+        tdi_i          ,
+        udr_i          ,
+        tms_i          ,
+        instruction_i  ,
+
+        register_o: data_reg_out,
+    );
+
+    assign data_reg_o = data_reg_out;
+
+    // ---
 }

@@ -56,6 +56,7 @@ module JtagTop (
         insn_o: insn,
     );
     // Data Regs
+		var data_reg: logic<8>;
     inst data_regs: jtag_vr::DataRegisters (
         rst_ni       : rst ,
         tck_i        : TCK ,
@@ -65,11 +66,14 @@ module JtagTop (
         cdr_i        : CDR ,
         sdr_i        : SDR ,
 				udr_i					: UDR,
+				tms_i: TMS,
+
+				data_reg_o: data_reg,
     );
     // Debugging
-    assign led0 = insn[0];
-    assign led1 = insn[1];
-    assign led2 = insn[2];
-    assign led3 = insn[3];
+    assign led0 = data_reg[0];
+    assign led1 = data_reg[1];
+    assign led2 = data_reg[2];
+    assign led3 = data_reg[3];
     // ---
 }
