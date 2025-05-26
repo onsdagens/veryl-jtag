@@ -27,6 +27,6 @@ to build the project and reprogram the FPGA.
 
 ## Expected behavior
 
-The FPGA acts as a JTAG device. The monochrome LEDs act as a bit display, showing the current state of the data register under instruction `0x1`. 
+The FPGA acts as a JTAG device. The monochrome LEDs act as a bit display, showing the current state (of the lowest 4 bits) of the data register under instruction `0x1`. 
 
 For our own (very simple testing) purposes, we have been using the `ftdaye` [`ECP5`](https://github.com/onsdagens/ftdaye/blob/master/examples/ECP5.rs) example to read out the `IDCODE` register, and for writing to the `0x1` custom register.
