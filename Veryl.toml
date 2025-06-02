@@ -3,8 +3,8 @@ name = "veryl_jtag"
 version = "0.1.0"
 
 [dependencies]
-jtag_vr = {version = "0.1.0", path = "./jtag-vr/"}
-tap_controller = {version = "0.1.0", path = "./tap-controller/"}
+jtag_vr = {version = "0.1.0", path = "./veryl-jtag/jtag-vr/"}
+tap_controller = {version = "0.1.0", path = "./veryl-jtag/tap-controller/"}
 
 [build]
 exclude_std = true

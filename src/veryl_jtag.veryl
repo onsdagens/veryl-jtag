@@ -25,6 +25,8 @@ module JtagTop (
     udr_o: output logic,
 
     instruction_o: output logic<4>,
+    //data_reg_o   : output logic<8>,
+    data_sr_o: output logic<8>,
 ) {
     // ---
     // TAP Controller
@@ -72,7 +74,8 @@ module JtagTop (
         insn_o: insn,
     );
     // Data Regs
-    var data_reg: logic<8>;
+    //var data_reg  : logic<8>;
+    //assign data_reg_o = data_reg;
     inst data_regs: jtag_vr::DataRegisters (
         rst_ni       : rst ,
         tck_i        : TCK ,
@@ -84,12 +87,7 @@ module JtagTop (
         udr_i        : UDR ,
         tms_i        : TMS ,
 
-        data_reg_o: data_reg,
+        data_reg_o: _        ,
+        data_sr_o : data_sr_o,
     );
-    // Debugging
-    assign led0 = data_reg[0];
-    assign led1 = data_reg[1];
-    assign led2 = data_reg[2];
-    assign led3 = data_reg[3];
-    // ---
 }

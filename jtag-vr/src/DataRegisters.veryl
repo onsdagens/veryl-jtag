@@ -15,6 +15,7 @@ module DataRegisters (
     // since they may (and probably will)
     // have different widths.
     data_reg_o: output logic<8>,
+    data_sr_o : output logic<8>,
 ) {
     // --- Intermediate signals
     var outputs   : logic [16];
@@ -69,8 +70,6 @@ module DataRegisters (
     // here we can technically up the throughput by capturing TDO directly,
     // but i don't really care for the extra edge case for some ~10% extra
     // on an already Mbit+ line when we are sending <100kB.
-    var data_reg_out: logic<8>;
-
     inst data_reg: DataRegister::<8> #(
         Writeable: true  ,
         Addr     : 'b0001,
@@ -86,10 +85,8 @@ module DataRegisters (
         tms_i          ,
         instruction_i  ,
 
-        register_o: data_reg_out,
+        register_o      : data_reg_o,
+        shift_register_o: data_sr_o ,
     );
-
-    assign data_reg_o = data_reg_out;
-
     // ---
 }

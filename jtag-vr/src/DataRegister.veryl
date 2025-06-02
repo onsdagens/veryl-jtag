@@ -17,12 +17,14 @@ module DataRegister::<DataSize: u32> #(
     udr_i        : input logic   ,
     instruction_i: input logic<4>,
 
-    register_o: output logic<DataSize>,
+    register_o      : output logic<DataSize>,
+    shift_register_o: output logic<DataSize>,
 ) {
-    var shift_register: logic<DataSize>;
-    assign bit_out        = shift_register[lsb];
-    var register      : logic<DataSize>;
-    assign register_o     = register;
+    var shift_register  : logic<DataSize>;
+    assign bit_out          = shift_register[lsb];
+    var register        : logic<DataSize>;
+    assign register_o       = register;
+    assign shift_register_o = shift_register;
     always_ff {
         if_reset {
             shift_register = 0;
